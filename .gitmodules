@@ -1,0 +1,4 @@
+[submodule "includes/libft"]
+	path = includes/libft
+	url = git@github.com:stanX19/libft.git
+	branch = main
