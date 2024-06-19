@@ -70,6 +70,7 @@ re: fclean $(NAME)
 
 push:
 	@echo -n "Commit name: "; read name; make fclean;\
-	git add .; git commit -m "$$name"; git push;
+	git add .; git commit -m "$$name"; git push;\
+	cd $(LIBFT_DIR); git add .; git commit -m "$$name"; git push;
 
 .PHONY: all clean fclean re bonus push
