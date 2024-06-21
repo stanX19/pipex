@@ -17,7 +17,7 @@ char	*get_executable(const char *name, char *const *envp)
 	{
 		ft_strnappend(2, &executable, "/", name);
 		if (access(executable, X_OK) == 0)
-			break;
+			break ;
 		free(executable);
 	}
 	ss_destroy(ss);
@@ -33,8 +33,58 @@ void	exec_command(const char *command, char *const *envp)
 	argv = ft_str_to_argv(command, &argc);
 	executable = get_executable(argv[0], envp);
 	execve(executable, argv, envp);
+	perror("execve");
 	ft_free_2d((void **)argv, argc);
 	free(executable);
+}
+
+void	start_subprocess(const char *command, char *const *envp, int fd_in,
+		int fd_out)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		exit(1);
+	}
+	else if (pid == 0)
+	{
+		dup2(fd_in, STDIN_FILENO);
+		dup2(fd_out, STDOUT_FILENO);
+		exec_command(command, envp);
+		exit(1);
+	}
+}
+
+void	pipe_all(char *const *commands, int count, int terminal_fd[2],
+		char *const *envp)
+{
+	int	pipefd[2];
+	int	in_fd;
+	int	i;
+
+	in_fd = terminal_fd[0];
+	i = 0;
+	while (i < count - 1)
+	{
+		if (pipe(pipefd))
+			exit(2);
+		start_subprocess(commands[i], envp, in_fd, pipefd[1]);
+		close(in_fd);
+		close(pipefd[1]);
+		in_fd = pipefd[0];
+		i++;
+	}
+	start_subprocess(commands[i], envp, in_fd, terminal_fd[1]);
+	close(in_fd);
+	close(terminal_fd[1]);
+	i = 0;
+	while (i++ < count)
+	{
+		wait(NULL);
+	}
 }
 
 int	main(int argc, char *const *argv, char *const *envp)
@@ -42,18 +92,17 @@ int	main(int argc, char *const *argv, char *const *envp)
 	int	in_fd;
 	int	out_fd;
 
-	if (argc != 5)
+	if (argc < 4)
 		return (1);
 	in_fd = open(argv[1], O_RDONLY);
-	out_fd = open(argv[4], O_RDWR | O_CREAT);
-	dup2(in_fd, STDIN_FILENO);
-	dup2(out_fd, STDOUT_FILENO);
-	exec_command(argv[2], envp);
+	out_fd = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC);
+	pipe_all(argv + 2, argc - 3, (int[2]){in_fd, out_fd}, envp);
+	return (0);
 }
-	// (void)argv;
-	// (void)argc;
-	// (void)envp;
-	// printf("DEBUG: access(\"./pipex\", X_OK) = %i\n", access("./pipex", X_OK));
+// (void)argv;
+// (void)argc;
+// (void)envp;
+// printf("DEBUG: access(\"./pipex\", X_OK) = %i\n", access("./pipex", X_OK));
 
 // int main(void)
 // {

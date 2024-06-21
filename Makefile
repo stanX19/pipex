@@ -23,7 +23,7 @@ UP			= \033[1A
 FLUSH		= \033[2K
 
 NAME		= pipex
-ARGV		= "input.txt" "cat -e" "cat -e" "/dev/stdout"
+ARGV		= "input.txt" "sleep 1" "sleep 1" "sleep 1" "sleep 1" "sleep 1" "sleep 1" "/dev/stdout"
 
 run: all
 	./$(NAME) $(ARGV)
