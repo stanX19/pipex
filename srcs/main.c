@@ -1,58 +1,59 @@
 #include "pipex.h"
 
-char	**get_paths(char *const *envp)
+char	*get_executable(const char *name, char *const *envp)
 {
+	char			*executable;
+	t_stringstream	*ss;
+
+	if (access(name, X_OK) == 0)
+		return (ft_strdup(name));
 	while (*envp && !ft_strnequ(*envp, "PATH", 4))
 		envp++;
 	if (!*envp)
 		return (NULL);
-	return (ft_split(*envp + 5, ':'));
-}
-
-char	*get_executable(const char *name, char *const *envp)
-{
-	int		i;
-	char	**paths;
-	char	*new_name;
-
-	paths = get_paths(envp);
-	new_name = NULL;
-	i = 0;
-	while (paths[i])
+	ss = ss_create(*envp + 5);
+	executable = NULL;
+	while (ss_read_line(ss, &executable, ":"))
 	{
-		printf("DEBUG: i = %i\n", i);
-		ft_strnappend(2, paths + i, "/", name);
-		printf("DEBUG: paths[i] = %s\n", paths[i]);
-		if (!access(paths[i], X_OK))
-		{
-			new_name = ft_strdup(paths[i]);
-			break ;
-		}
-		i++;
+		ft_strnappend(2, &executable, "/", name);
+		if (access(executable, X_OK) == 0)
+			break;
+		free(executable);
 	}
-	ft_tokens_free(paths);
-	return (new_name);
+	ss_destroy(ss);
+	return (executable);
 }
 
 void	exec_command(const char *command, char *const *envp)
 {
-	char	*file;
+	char	*executable;
 	char	**argv;
 	int		argc;
 
 	argv = ft_str_to_argv(command, &argc);
-	file = get_executable(argv[0], envp);
-	execve(file, argv, envp);
+	executable = get_executable(argv[0], envp);
+	execve(executable, argv, envp);
 	ft_free_2d((void **)argv, argc);
-	free(file);
+	free(executable);
 }
 
 int	main(int argc, char *const *argv, char *const *envp)
 {
-	if (argc < 5)
+	int	in_fd;
+	int	out_fd;
+
+	if (argc != 5)
 		return (1);
+	in_fd = open(argv[1], O_RDONLY);
+	out_fd = open(argv[4], O_RDWR | O_CREAT);
+	dup2(in_fd, STDIN_FILENO);
+	dup2(out_fd, STDOUT_FILENO);
 	exec_command(argv[2], envp);
 }
+	// (void)argv;
+	// (void)argc;
+	// (void)envp;
+	// printf("DEBUG: access(\"./pipex\", X_OK) = %i\n", access("./pipex", X_OK));
 
 // int main(void)
 // {
