@@ -23,7 +23,7 @@ UP			= \033[1A
 FLUSH		= \033[2K
 
 NAME		= pipex
-ARGV		= "input.txt" "sleep 1" "sleep 1" "sleep 1" "sleep 1" "sleep 1" "sleep 1" "/dev/stdout"
+ARGV		= "input.txt" "cat -te" "cat -te" "cat -te" "cat -te" "cat -te" "cat -te" "/dev/stdout"
 
 run: all
 	./$(NAME) $(ARGV)
@@ -72,5 +72,16 @@ push:
 	@echo -n "Commit name: "; read name; make fclean;\
 	git add .; git commit -m "$$name"; git push;\
 	cd $(LIBFT_DIR); git add .; git commit -m "$$name"; git push;
+
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+ifeq ($(BRANCH),HEAD)
+BRANCH := main
+endif
+pull:
+	git fetch --all
+	git checkout -f $(BRANCH);
+	git reset --hard origin/$(BRANCH);
+	git submodule update --init --remote --recursive
+	make -C $(LIBFT_DIR) pull
 
 .PHONY: all clean fclean re bonus push

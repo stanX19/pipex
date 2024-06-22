@@ -15,7 +15,7 @@ char	*get_executable(const char *name, char *const *envp)
 	executable = NULL;
 	while (ss_read_line(ss, &executable, ":"))
 	{
-		ft_strnappend(2, &executable, "/", name);
+		ft_strnappend(&executable, 2, "/", name);
 		if (access(executable, X_OK) == 0)
 			break ;
 		free(executable);
@@ -95,7 +95,12 @@ int	main(int argc, char *const *argv, char *const *envp)
 	if (argc < 4)
 		return (1);
 	in_fd = open(argv[1], O_RDONLY);
-	out_fd = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC);
+	if (!in_fd)
+	{
+		ft_dprintf(2, "No such file: \"%s\"", argv[1]);
+		exit(1);
+	}
+	out_fd = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	pipe_all(argv + 2, argc - 3, (int[2]){in_fd, out_fd}, envp);
 	return (0);
 }
