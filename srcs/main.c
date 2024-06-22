@@ -87,6 +87,23 @@ void	pipe_all(char *const *commands, int count, int terminal_fd[2],
 	}
 }
 
+void here_doc(void)
+{
+	t_fstream *fs;
+	char		*line;
+
+	fs = fs_create("input.txt");
+	ft_printf("here_doc>");
+	while (fs_getline(fs, &line, "\n") && !ft_strequ(line, "end"))
+	{
+		ft_printf("|%s|\nhere_doc> ", line);
+		free(line);
+	}
+	if (line)
+		free(line);
+	fs_destroy(fs);
+}
+
 int	main(int argc, char *const *argv, char *const *envp)
 {
 	int	in_fd;
@@ -102,6 +119,7 @@ int	main(int argc, char *const *argv, char *const *envp)
 	}
 	out_fd = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	pipe_all(argv + 2, argc - 3, (int[2]){in_fd, out_fd}, envp);
+	here_doc();
 	return (0);
 }
 // (void)argv;
