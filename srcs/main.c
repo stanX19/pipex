@@ -12,7 +12,6 @@ char	*get_executable(const char *name, char *const *envp)
 	if (!*envp)
 		return (NULL);
 	ss = ss_create(*envp + 5);
-	executable = NULL;
 	while (ss_read_line(ss, &executable, ":"))
 	{
 		ft_strnappend(&executable, 2, "/", name);
@@ -31,9 +30,17 @@ void	exec_command(const char *command, char *const *envp)
 	int		argc;
 
 	argv = ft_str_to_argv(command, &argc);
+	if (argv == NULL)
+		return ;
 	executable = get_executable(argv[0], envp);
+	if (executable == NULL)
+	{
+		ft_dprintf(2, "command not found: %s\n", argv[0]);
+		ft_free_2d((void **)argv, argc);
+		return ;
+	}
 	execve(executable, argv, envp);
-	perror("execve");
+	perror(argv[0]);
 	ft_free_2d((void **)argv, argc);
 	free(executable);
 }
@@ -70,7 +77,10 @@ void	pipe_all(char *const *commands, int count, int terminal_fd[2],
 	while (i < count - 1)
 	{
 		if (pipe(pipefd))
+		{
+			perror("pipe");
 			exit(2);
+		}
 		start_subprocess(commands[i], envp, in_fd, pipefd[1]);
 		close(in_fd);
 		close(pipefd[1]);
@@ -82,46 +92,88 @@ void	pipe_all(char *const *commands, int count, int terminal_fd[2],
 	close(terminal_fd[1]);
 	i = 0;
 	while (i++ < count)
-	{
 		wait(NULL);
-	}
 }
 
-void here_doc(void)
+int	here_doc(const char *limiter)
 {
-	t_fstream *fs;
+	t_fstream	*fs;
 	char		*line;
+	int			pipefd[2];
 
-	fs = fs_create("input.txt");
-	ft_printf("here_doc>");
-	while (fs_getline(fs, &line, "\n") && !ft_strequ(line, "end"))
+	if (pipe(pipefd))
+		return (-1);
+	fs = fs_create("/dev/stdin");
+	if (!fs)
+		return (-1);
+	ft_printf("heredoc> ");
+	while (fs_getline(fs, &line, "\n") && !ft_strequ(limiter, line))
 	{
-		ft_printf("|%s|\nhere_doc> ", line);
+		ft_printf("heredoc> ");
+		ft_dprintf(pipefd[1], "%s\n", line);
 		free(line);
 	}
 	if (line)
 		free(line);
 	fs_destroy(fs);
+	close(pipefd[1]);
+	return (pipefd[0]);
+}
+
+void	set_normal_io(int terminal_fd[2], int argc, char *const *argv)
+{
+	terminal_fd[0] = open(argv[1], O_RDONLY);
+	if (terminal_fd[0] == -1)
+	{
+		ft_dprintf(2, "%s: \"%s\"\n", strerror(errno), argv[1]);
+		exit(0);
+	}
+	terminal_fd[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
+	if (terminal_fd[1] == -1)
+	{
+		ft_dprintf(2, "%s: \"%s\"\n", strerror(errno), argv[argc - 1]);
+		exit(1);
+	}
+}
+
+void	set_heredoc_io(int terminal_fd[2], int argc, char *const *argv)
+{
+	terminal_fd[0] = here_doc(argv[2]);
+	if (terminal_fd[0] == -1)
+	{
+		ft_dprintf(2, "%s: \"%s\"\n", strerror(errno), argv[1]);
+		exit(0);
+	}
+	terminal_fd[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_APPEND, 0777);
+	if (terminal_fd[1] == -1)
+	{
+		ft_dprintf(2, "%s: \"%s\"\n", strerror(errno), argv[argc - 1]);
+		exit(1);
+	}
 }
 
 int	main(int argc, char *const *argv, char *const *envp)
 {
-	int	in_fd;
-	int	out_fd;
+	int terminal_fd[2];
 
 	if (argc < 4)
-		return (1);
-	in_fd = open(argv[1], O_RDONLY);
-	if (!in_fd)
 	{
-		ft_dprintf(2, "No such file: \"%s\"", argv[1]);
-		exit(1);
+		ft_dprintf(2, "Error: too few arguments\n");
+		return (1);
 	}
-	out_fd = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
-	pipe_all(argv + 2, argc - 3, (int[2]){in_fd, out_fd}, envp);
-	here_doc();
+	if (ft_strequ(argv[1], "here_doc"))
+	{
+		set_heredoc_io(terminal_fd, argc, argv);
+		pipe_all(argv + 3, argc - 4, terminal_fd, envp);
+	}
+	else
+	{
+		set_normal_io(terminal_fd, argc, argv);
+		pipe_all(argv + 2, argc - 3, terminal_fd, envp);
+	}
 	return (0);
 }
+
 // (void)argv;
 // (void)argc;
 // (void)envp;

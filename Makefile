@@ -23,10 +23,11 @@ UP			= \033[1A
 FLUSH		= \033[2K
 
 NAME		= pipex
-ARGV		= "input.txt" "cat -te" "cat -te" "cat -te" "cat -te" "cat -te" "cat -te" "/dev/stdout"
+ARGV		= "input.txt" "cat -te" "cat -te" "cat -te" "cat -te" "cat -te" "cat -te" "output.txt"
 
 run: all
 	./$(NAME) $(ARGV)
+	cat output.txt
 
 LIBFT_DIR	= $(INCLUDE_DIR)/libft
 LIBFT		= $(LIBFT_DIR)/libft.a
@@ -46,6 +47,8 @@ init_libft: $(LIBFT_DIR)
 $(NAME): $(LIBS) $(OBJDIRS) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(IFLAGS) $(LIBS) -o $(NAME)
 
+bonus: all
+
 all: $(NAME)
 
 $(OBJDIRS):
@@ -56,19 +59,26 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
 	@echo "$(UP)$(FLUSH)$(UP)$(FLUSH)$(UP)$(FLUSH)$(UP)"
 
+TESTDIR = tester
+$(TESTDIR):
+	git clone https://github.com/ael-bekk/PIPEX_TESTER.git $(TESTDIR)
+
+test: $(TESTDIR)
+	cd $(TESTDIR); sh tester.sh
+
 clean:
 	@$(RM) $(OBJS)
 
 fclean:	clean
 	make -C $(LIBFT_DIR) fclean
 	@$(RM) $(NAME)
-	@$(RM) $(TESTDIR)
 	@$(RM) $(OBJDIRS)
 	@$(RM) ./a.out
 
 re: fclean $(NAME)
 
 push:
+	$(RM) $(TESTDIR)
 	@echo -n "Commit name: "; read name; make fclean;\
 	cd $(LIBFT_DIR); git add .; git commit -m "$$name"; git push;\
 	cd $(CWD); git add .; git commit -m "$$name"; git push;\
