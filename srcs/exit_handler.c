@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit_handler.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stan <shatan@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: shatan <shatan@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 19:14:45 by stan              #+#    #+#             */
-/*   Updated: 2024/06/25 19:14:45 by stan             ###   ########.fr       */
+/*   Updated: 2024/06/26 12:26:45 by shatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	exit_handler(const char *msg, int exit_code)
 		if (errno)
 			perror(msg);
 		else
-			ft_putstr_fd(msg, 2);
+			ft_putendl_fd(msg, 2);
 	}
 	while (wait(NULL) > 0)
 		;

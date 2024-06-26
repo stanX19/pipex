@@ -1,2 +1,1 @@
 fix according to tester, may be caused by exit no (signal)
-make sure wait for every single child

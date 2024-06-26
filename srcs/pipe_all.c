@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_all.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stan <shatan@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: shatan <shatan@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 19:14:59 by stan              #+#    #+#             */
-/*   Updated: 2024/06/25 19:14:59 by stan             ###   ########.fr       */
+/*   Updated: 2024/06/26 12:26:26 by shatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ static void	start_subprocess(const char *command, char *const *envp, int fd_in,
 {
 	pid_t	pid;
 
+	if (fd_in < 0)
+		return ;
 	pid = fork();
 	if (pid < 0)
 	{
@@ -53,5 +55,10 @@ void	pipe_all(char *const *commands, int count, int terminal_fd[2],
 	start_subprocess(commands[i], envp, in_fd, terminal_fd[1]);
 	close(in_fd);
 	close(terminal_fd[1]);
+	if (terminal_fd[1] == -1)
+	{
+		errno = 0;
+		exit_handler("no such file or directory", 1);
+	}
 	exit_handler(NULL, 0);
 }

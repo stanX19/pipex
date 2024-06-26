@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stan <shatan@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: shatan <shatan@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:28:10 by stan              #+#    #+#             */
-/*   Updated: 2024/06/25 19:14:53 by stan             ###   ########.fr       */
+/*   Updated: 2024/06/26 11:28:28 by shatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,29 @@
 static void	set_normal_io(int terminal_fd[2], int argc, char *const *argv)
 {
 	terminal_fd[0] = open(argv[1], O_RDONLY);
+	terminal_fd[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (terminal_fd[0] < 0)
 	{
-		exit_handler(argv[1], 0);
+		ft_dprintf(2, "no such file or directory: %s\n", argv[1]);
 	}
-	terminal_fd[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
-	if (terminal_fd[1] < 0)
-	{
-		close(terminal_fd[0]);
-		exit_handler(argv[argc - 1], 1);
-	}
+	// if (terminal_fd[1] < 0)
+	// {
+	// 	ft_dprintf("no such file or directory: %s\n", argv[argc - 1]);
+	// }
 }
 
 static void	set_heredoc_io(int terminal_fd[2], int argc, char *const *argv)
 {
 	terminal_fd[0] = here_doc(argv[2]);
+	terminal_fd[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_APPEND, 0777);
 	if (terminal_fd[0] < 0)
 	{
-		exit_handler(argv[1], 0);
+		ft_dprintf(2, "no such file or directory: %s\n", argv[1]);
 	}
-	terminal_fd[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_APPEND, 0777);
-	if (terminal_fd[1] < 0)
-	{
-		close(terminal_fd[0]);
-		exit_handler(argv[argc - 1], 1);
-	}
+	// if (terminal_fd[1] < 0)
+	// {
+	// 	ft_dprintf("no such file or directory: %s\n", argv[argc - 1]);
+	// }
 }
 
 int	main(int argc, char *const *argv, char *const *envp)
@@ -81,3 +79,4 @@ int	main(int argc, char *const *argv, char *const *envp)
 // 	}
 // 	ft_free_2d((void **)argv, argc);
 // }
+

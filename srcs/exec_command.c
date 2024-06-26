@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_command.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stan <shatan@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: shatan <shatan@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 19:14:37 by stan              #+#    #+#             */
-/*   Updated: 2024/06/25 19:14:37 by stan             ###   ########.fr       */
+/*   Updated: 2024/06/26 12:32:40 by shatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,10 @@ void	exec_command(const char *command, char *const *envp)
 	executable = get_executable(argv[0], envp);
 	if (executable == NULL)
 	{
-		ft_dprintf(2, "command not found: %s\n", argv[0]);
+		if (argv[0][0] == '/')
+			ft_dprintf(2, "no such file or directory: %s\n", argv[0]);
+		else
+			ft_dprintf(2, "command not found: %s\n", argv[0]);
 		ft_free_2d((void **)argv, argc);
 		return ;
 	}
