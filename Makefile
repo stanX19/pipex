@@ -94,4 +94,4 @@ pull:
 	git submodule update --init --remote --recursive
 	make -C $(LIBFT_DIR) pull
 
-.PHONY: all clean fclean re bonus push
+.PHONY: all clean fclean re bonus push init_libft
