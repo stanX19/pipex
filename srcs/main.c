@@ -6,7 +6,7 @@
 /*   By: shatan <shatan@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:28:10 by stan              #+#    #+#             */
-/*   Updated: 2024/06/26 11:28:28 by shatan           ###   ########.fr       */
+/*   Updated: 2024/06/26 15:55:47 by shatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,6 @@ static void	set_normal_io(int terminal_fd[2], int argc, char *const *argv)
 	{
 		ft_dprintf(2, "no such file or directory: %s\n", argv[1]);
 	}
-	// if (terminal_fd[1] < 0)
-	// {
-	// 	ft_dprintf("no such file or directory: %s\n", argv[argc - 1]);
-	// }
 }
 
 static void	set_heredoc_io(int terminal_fd[2], int argc, char *const *argv)
@@ -34,10 +30,6 @@ static void	set_heredoc_io(int terminal_fd[2], int argc, char *const *argv)
 	{
 		ft_dprintf(2, "no such file or directory: %s\n", argv[1]);
 	}
-	// if (terminal_fd[1] < 0)
-	// {
-	// 	ft_dprintf("no such file or directory: %s\n", argv[argc - 1]);
-	// }
 }
 
 int	main(int argc, char *const *argv, char *const *envp)
@@ -69,14 +61,22 @@ int	main(int argc, char *const *argv, char *const *envp)
 
 // int main(void)
 // {
-// 	char *str = "hello\\\\\\\\ mother *******";
+// 	t_fstream	*fs;
+// 	char *str;
 // 	int argc;
-// 	char **argv = ft_str_to_argv(str, &argc);
+// 	char **argv;
 
-// 	for(int i = 0; i < argc; i++)
+// 	fs = fs_create("/dev/stdin");
+// 	ft_printf(">>> ");
+// 	while (fs_getline(fs, &str, "\n"))
 // 	{
-// 		printf("|%s|\n", argv[i]);
+// 		argv = ft_str_to_argv(str, &argc);
+// 		for(int i = 0; i < argc; i++)
+// 		{
+// 			ft_printf("|%s|\n", argv[i]);
+// 		}
+// 		ft_printf(">>> ");
+// 		free(str);
+// 		ft_free_2d((void **)argv, argc);
 // 	}
-// 	ft_free_2d((void **)argv, argc);
 // }
-

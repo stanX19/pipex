@@ -6,7 +6,7 @@
 /*   By: shatan <shatan@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 19:14:59 by stan              #+#    #+#             */
-/*   Updated: 2024/06/26 12:26:26 by shatan           ###   ########.fr       */
+/*   Updated: 2024/06/26 15:55:35 by shatan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ static void	start_subprocess(const char *command, char *const *envp, int fd_in,
 void	pipe_all(char *const *commands, int count, int terminal_fd[2],
 		char *const *envp)
 {
-	int pipefd[2];
-	int in_fd;
-	int i;
+	int	pipefd[2];
+	int	in_fd;
+	int	i;
 
 	in_fd = terminal_fd[0];
 	i = 0;
