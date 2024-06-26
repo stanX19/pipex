@@ -43,7 +43,6 @@ $(LIBFT_DIR):
 
 init_libft: $(LIBFT_DIR)
 
-
 $(NAME): $(LIBS) $(OBJDIRS) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(IFLAGS) $(LIBS) -o $(NAME)
 
